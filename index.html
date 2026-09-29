@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Bīr · Income Tracker</title>
+<meta name="theme-color" content="#0E1512">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- ================= PIN LOCK FLOW (full-screen) ================= -->
+<div id="lock-flow" role="dialog" aria-modal="true" aria-label="App lock">
+  <div class="lock-inner" id="lock-inner"></div>
+</div>
+
+<div id="app-frame">
+
+  <!-- ================= APP BAR ================= -->
+  <header class="appbar">
+    <div class="brand">
+      <div class="brand-mark">ብ</div>
+      <div class="brand-text">Bīr<small>Income Tracker</small></div>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="icon-btn" id="btn-lock-now" aria-label="Lock app" style="display:none;">
+        <span class="material-icons">lock</span>
+      </button>
+      <button class="icon-btn" id="btn-settings" aria-label="Open settings">
+        <span class="material-icons">settings</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= RESPONSIVE DASHBOARD ================= -->
+  <div class="dashboard" id="dashboard">
+    <div class="dash-col-left">
+
+      <!-- ================= BALANCE CARD ================= -->
+      <section class="balance-wrap">
+        <div class="balance-card">
+          <div class="balance-top">
+            <div class="balance-label">
+              <span class="material-icons" style="font-size:16px;">account_balance_wallet</span>
+              Total Income
+            </div>
+            <button class="eye-btn" id="btn-eye" aria-label="Toggle balance visibility">
+              <span class="material-icons" id="eye-icon">visibility</span>
+            </button>
+          </div>
+          <div class="balance-amount"><span class="cur">ETB</span><span id="balance-value">0.00</span></div>
+          <div class="balance-sub" id="balance-sub">No transactions yet</div>
+          <div class="filter-row">
+            <button class="chip-btn" id="btn-filter"><span class="material-icons">tune</span><span id="filter-chip-label">Last 30 Days</span></button>
+            <div class="tibeb" style="flex:1; margin-left:12px; max-width:90px;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= STATS ================= -->
+      <section class="stats-row" id="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon"><span class="material-icons">today</span></div>
+          <div class="stat-value" id="stat-today">ETB 0</div>
+          <div class="stat-label">Today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><span class="material-icons">calendar_month</span></div>
+          <div class="stat-value" id="stat-month">ETB 0</div>
+          <div class="stat-label">This Month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon"><span class="material-icons">receipt_long</span></div>
+          <div class="stat-value" id="stat-count">0</div>
+          <div class="stat-label">Transactions</div>
+        </div>
+      </section>
+
+    </div>
+    <div class="dash-col-right">
+
+      <!-- ================= SEARCH + SORT ================= -->
+      <section class="toolbar">
+        <div class="search-field">
+          <span class="material-icons">search</span>
+          <input type="text" id="search-input" placeholder="Search source, note or amount" aria-label="Search income">
+        </div>
+        <div class="sort-select">
+          <button class="sort-btn" id="btn-sort" aria-label="Sort transactions">
+            <span class="material-icons">swap_vert</span>
+          </button>
+        </div>
+      </section>
+
+      <div class="section-label">
+        <span id="history-count-label">History</span>
+      </div>
+
+      <!-- ================= TRANSACTION LIST ================= -->
+      <section class="tx-list" id="tx-list"></section>
+
+      <!-- ================= EMPTY STATE ================= -->
+      <div class="empty-state" id="empty-state">
+        <svg class="empty-illustration" viewBox="0 0 120 120" fill="none">
+          <circle cx="60" cy="60" r="58" fill="var(--surface-2)"/>
+          <rect x="34" y="42" width="52" height="38" rx="10" fill="var(--surface-3)" stroke="var(--border-strong)" stroke-width="1.5"/>
+          <path d="M34 54 H86" stroke="var(--border-strong)" stroke-width="1.5"/>
+          <circle cx="60" cy="67" r="9" fill="var(--primary-dim)" stroke="var(--primary)" stroke-width="1.5"/>
+          <text x="60" y="71" font-family="Manrope" font-size="10" font-weight="700" fill="var(--primary-strong)" text-anchor="middle">B</text>
+          <circle cx="86" cy="40" r="12" fill="var(--accent)" opacity=".85"/>
+          <text x="86" y="44" font-family="Manrope" font-size="13" font-weight="800" fill="#2b2107" text-anchor="middle">+</text>
+        </svg>
+        <h3>No income records yet</h3>
+        <p>Start tracking your earnings — every birr counted brings a clearer picture of your finances.</p>
+        <button class="btn btn-primary" id="btn-empty-add"><span class="material-icons">add</span>Add Your First Income</button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ================= FAB ================= -->
+<button class="fab" id="btn-fab" aria-label="Add income">
+  <span class="material-icons">add</span>
+</button>
+
+<!-- ================= OVERLAY ================= -->
+<div class="overlay" id="overlay"></div>
+
+<!-- ================= ADD/EDIT SHEET ================= -->
+<div class="sheet" id="sheet-form" role="dialog" aria-modal="true" aria-labelledby="form-title">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <div class="sheet-title" id="form-title">Add Income</div>
+    <button class="icon-btn" id="btn-close-form" aria-label="Close"><span class="material-icons">close</span></button>
+  </div>
+  <div class="sheet-body">
+    <form id="income-form" novalidate>
+      <input type="hidden" id="f-id">
+
+      <div class="field" id="field-amount">
+        <label for="f-amount">Amount</label>
+        <div class="input-wrap">
+          <span class="prefix">ETB</span>
+          <input type="number" id="f-amount" inputmode="decimal" step="0.01" min="0" placeholder="0.00" aria-required="true">
+        </div>
+        <div class="field-error">Please enter a valid amount.</div>
+      </div>
+
+      <div class="field" id="field-source">
+        <label>Income Source</label>
+        <div class="source-grid" id="source-grid"></div>
+        <input type="hidden" id="f-source">
+        <div class="field-error">Please choose an income source.</div>
+      </div>
+
+      <div class="field" id="field-date">
+        <label>Ethiopian Date</label>
+        <div class="select-trio">
+          <select id="f-day" aria-label="Ethiopian day"></select>
+          <select id="f-month" aria-label="Ethiopian month"></select>
+          <select id="f-year" aria-label="Ethiopian year"></select>
+        </div>
+        <button type="button" class="today-btn" id="btn-today"><span class="material-icons" style="font-size:14px;">today</span>Use Today</button>
+        <div class="field-error">Please select a valid date.</div>
+      </div>
+
+      <div class="field">
+        <label for="f-note">Note <span style="text-transform:none; font-weight:500; color:var(--text-faint);">(optional)</span></label>
+        <textarea id="f-note" placeholder="Add a note about this income..."></textarea>
+      </div>
+
+      <div class="btn-row" style="margin-top:8px;">
+        <button type="button" class="btn btn-ghost" style="flex:1;" id="btn-cancel-form">Cancel</button>
+        <button type="submit" class="btn btn-primary" style="flex:1.4;" id="btn-save-form"><span class="material-icons">check</span><span id="save-form-label">Save Income</span></button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ================= FILTER SHEET ================= -->
+<div class="sheet" id="sheet-filter" role="dialog" aria-modal="true">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <div class="sheet-title">Filter by Date</div>
+    <button class="icon-btn" id="btn-close-filter" aria-label="Close"><span class="material-icons">close</span></button>
+  </div>
+  <div class="sheet-body">
+    <div id="filter-options"></div>
+    <div class="custom-range" id="custom-range">
+      <div class="range-label">From</div>
+      <div class="select-trio">
+        <select id="cf-day"></select><select id="cf-month"></select><select id="cf-year"></select>
+      </div>
+      <div class="range-label">To</div>
+      <div class="select-trio">
+        <select id="ct-day"></select><select id="ct-month"></select><select id="ct-year"></select>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" id="btn-apply-filter" style="margin-top:18px;">Apply Filter</button>
+  </div>
+</div>
+
+<!-- ================= SETTINGS SHEET ================= -->
+<div class="sheet" id="sheet-settings" role="dialog" aria-modal="true">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <div class="sheet-title">Settings</div>
+    <button class="icon-btn" id="btn-close-settings" aria-label="Close"><span class="material-icons">close</span></button>
+  </div>
+  <div class="sheet-body">
+    <div class="range-label" style="margin-top:0;">Appearance</div>
+    <div class="theme-toggle-row">
+      <div class="theme-opt" id="opt-theme-dark">
+        <div class="theme-swatch dark"></div>
+        <span style="font-size:12.5px; font-weight:700;">Dark Mode</span>
+      </div>
+      <div class="theme-opt" id="opt-theme-light">
+        <div class="theme-swatch light"></div>
+        <span style="font-size:12.5px; font-weight:700;">Light Mode</span>
+      </div>
+    </div>
+
+    <div class="range-label">Preferences</div>
+    <div class="settings-row">
+      <div class="settings-row-text">
+        <span class="material-icons">animation</span>
+        <div><div class="settings-row-title">Animations</div><div class="settings-row-sub">Micro-interactions & transitions</div></div>
+      </div>
+      <div class="switch on" id="switch-anim"></div>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-text">
+        <span class="material-icons">filter_alt_off</span>
+        <div><div class="settings-row-title">Reset Filters</div><div class="settings-row-sub">Back to Last 30 Days</div></div>
+      </div>
+      <button class="btn btn-ghost" id="btn-reset-filters" style="padding:8px 14px; font-size:12.5px;">Reset</button>
+    </div>
+
+    <div class="range-label">Security</div>
+    <div class="settings-row">
+      <div class="settings-row-text">
+        <span class="material-icons">lock</span>
+        <div><div class="settings-row-title">PIN Lock</div><div class="settings-row-sub" id="pin-lock-sub">Require a PIN to open the app</div></div>
+      </div>
+      <div class="switch" id="switch-pin-lock"></div>
+    </div>
+    <div class="settings-row" id="row-change-pin" style="display:none;">
+      <div class="settings-row-text">
+        <span class="material-icons">password</span>
+        <div><div class="settings-row-title">Change PIN</div><div class="settings-row-sub">Update your PIN & recovery question</div></div>
+      </div>
+      <button class="icon-btn" id="btn-change-pin"><span class="material-icons">chevron_right</span></button>
+    </div>
+
+    <div class="range-label">Data</div>
+    <div class="settings-row">
+      <div class="settings-row-text">
+        <span class="material-icons">picture_as_pdf</span>
+        <div><div class="settings-row-title">Export PDF Statement</div><div class="settings-row-sub">Export the currently filtered view</div></div>
+      </div>
+      <button class="icon-btn" id="btn-export-pdf"><span class="material-icons">download</span></button>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-text">
+        <span class="material-icons" style="color:var(--danger-strong);">delete_forever</span>
+        <div><div class="settings-row-title">Clear All Data</div><div class="settings-row-sub">Permanently remove all records</div></div>
+      </div>
+      <button class="icon-btn" id="btn-clear-data" style="color:var(--danger-strong); border-color:rgba(226,104,95,.35);"><span class="material-icons">delete</span></button>
+    </div>
+
+    <div class="range-label">About</div>
+    <div style="padding:4px 2px 10px; font-size:12.5px; color:var(--text-dim); line-height:1.6;">
+      <b style="color:var(--text);">Bīr Income Tracker</b> · v2.0<br>
+      A premium income tracker built for the Ethiopian calendar and Birr currency. Your data syncs to your own private Firestore cloud and stays available across sessions and devices signed into this app.
+    </div>
+  </div>
+</div>
+
+<!-- ================= TRANSACTION DETAIL MODAL ================= -->
+<div class="modal-center" id="modal-detail" role="dialog" aria-modal="true">
+  <div class="detail-hero">
+    <div class="detail-icon"><span class="material-icons" id="detail-icon">work</span></div>
+    <div class="detail-amount" id="detail-amount">ETB 0.00</div>
+    <div class="detail-source" id="detail-source">Salary</div>
+  </div>
+  <div class="detail-list">
+    <div class="detail-item"><div class="detail-item-label">Ethiopian Date</div><div class="detail-item-value" id="detail-date">—</div></div>
+    <div class="detail-item" id="detail-note-row"><div class="detail-item-label">Note</div><div class="detail-item-value" id="detail-note">—</div></div>
+    <div class="detail-item"><div class="detail-item-label">Date Created</div><div class="detail-item-value" id="detail-created">—</div></div>
+    <div class="detail-item"><div class="detail-item-label">Last Modified</div><div class="detail-item-value" id="detail-modified">—</div></div>
+    <div class="detail-item"><div class="detail-item-label">Transaction ID</div><div class="detail-item-value mono" id="detail-id">—</div></div>
+  </div>
+  <div class="detail-actions">
+    <button class="btn btn-ghost" id="btn-detail-close">Close</button>
+    <button class="btn btn-ghost" id="btn-detail-edit"><span class="material-icons" style="font-size:17px;">edit</span>Edit</button>
+    <button class="btn btn-danger" id="btn-detail-delete"><span class="material-icons" style="font-size:17px;">delete</span>Delete</button>
+  </div>
+</div>
+
+<!-- ================= DELETE CONFIRM ================= -->
+<div class="modal-center" id="modal-confirm" role="alertdialog" aria-modal="true">
+  <div class="confirm-body">
+    <div class="confirm-icon"><span class="material-icons">warning</span></div>
+    <h3>Delete this record?</h3>
+    <p>Are you sure you want to delete this income record? This action cannot be undone.</p>
+  </div>
+  <div class="confirm-actions">
+    <button class="btn btn-ghost" style="flex:1;" id="btn-confirm-cancel">Cancel</button>
+    <button class="btn btn-danger" style="flex:1;" id="btn-confirm-delete">Delete</button>
+  </div>
+</div>
+
+<!-- ================= CLEAR-ALL CONFIRM ================= -->
+<div class="modal-center" id="modal-clear-confirm" role="alertdialog" aria-modal="true">
+  <div class="confirm-body">
+    <div class="confirm-icon"><span class="material-icons">delete_forever</span></div>
+    <h3>Clear all data?</h3>
+    <p>This will permanently delete every income record in your cloud storage. Consider exporting a PDF first.</p>
+  </div>
+  <div class="confirm-actions">
+    <button class="btn btn-ghost" style="flex:1;" id="btn-clear-cancel">Cancel</button>
+    <button class="btn btn-danger" style="flex:1;" id="btn-clear-confirm">Clear Data</button>
+  </div>
+</div>
+
+<!-- ================= TOASTS ================= -->
+<div id="toast-stack" aria-live="polite"></div>
+
+<!-- Firebase (compat build, loaded eagerly — the app needs Firestore from the start) -->
+<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore-compat.js"></script>
+
+<!-- App modules, in dependency order -->
+<script src="js/calendar.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/animations.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/db.js"></script>
+<script src="js/security.js"></script>
+<script src="js/pdf-export.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
